@@ -12,6 +12,17 @@ class ExamMarkCalculator
         foreach ($payload['students'] as $student) {
             $results[] = $this->calculateStudent($student, $payload);
         }
+
+        $results['institute_id'] = $payload['institute_id'];
+        $results['exam_type'] = 'semester';
+        $results['exam_name'] = $payload['exam_name'];
+        $results['subject_name'] = $payload['subject_name'];
+        $results['academic_year_id'] = $payload['academic_year_id'];
+        $results['department_id'] = $payload['department_id'];
+        $results['combination_pivot_id'] = $payload['combination_pivot_id'];
+        $results['exam_id'] = $payload['exam_id'];
+        $results['subject_id'] = $payload['subject_id'];
+
         return $results;
     }
 

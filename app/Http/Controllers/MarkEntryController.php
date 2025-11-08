@@ -3,31 +3,31 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Jobs\CalculateExamMarksJob;
 use Illuminate\Support\Facades\Log;
 
 class MarkEntryController extends Controller
 {
-    // MarkCalculationController.php
     public function calculate(Request $request)
     {
         Log::channel('exam_flex_log')->info('Mark Calculation Request', [
             'request' => $request->all()
         ]);
-        $instituteId = $request->attributes->get('institute_id');
+        
+        $credentials = $request->getUserPass();
+
+        $domainRecord = DB::table('client_domains')->where('username', $credentials['username'])
+            ->where('password', $credentials['password'])
+            ->first();
+
+        if (!$domainRecord) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
 
         // Dispatch Job
         $job = CalculateExamMarksJob::dispatch(
             $request->all(),
-            $instituteId,
-            $request->header('X-Institute-Details-ID'),
-            $request->only([
-                'academic_year_id',
-                'department_id',
-                'combinations_pivot_id',
-                'exam_id',
-                'subject_id'
-            ])
         )->onQueue('exam_calculations');
 
         Log::channel('exam_flex_log')->info('Mark Calculation Job Dispatched', [
