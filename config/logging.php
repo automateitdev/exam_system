@@ -127,6 +127,13 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+         'exam_flex_log' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/exam_flex.log'),
+            'level' => 'debug',
+            'days' => 30,
+        ],
+
     ],
 
 ];
