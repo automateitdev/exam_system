@@ -14,15 +14,18 @@ class MarkEntryController extends Controller
         Log::channel('exam_flex_log')->info('Mark Calculation Request', [
             'request' => $request->all()
         ]);
-        
+
         $credentials = $request->getUserPass();
 
+        if (!$credentials || !isset($credentials['username']) || !isset($credentials['password'])) {
+            return response()->json(['error' => 'Unauthorized Credentials'], 401);
+        }
         $domainRecord = DB::table('client_domains')->where('username', $credentials['username'])
             ->where('password', $credentials['password'])
             ->first();
 
         if (!$domainRecord) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Unauthorized domain'], 401);
         }
 
         // Dispatch Job
