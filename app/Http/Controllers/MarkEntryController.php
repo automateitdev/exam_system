@@ -26,7 +26,7 @@ class MarkEntryController extends Controller
             return response()->json(['error' => 'Unauthorized Credentials'], 401);
         }
         $domainRecord = DB::table('client_domains')->where('username', $credentials['username'])
-            ->where('password', $credentials['password'])
+            ->where('password_hash', $credentials['password'])
             ->first();
 
         if (!$domainRecord) {
