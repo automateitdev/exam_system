@@ -18,9 +18,12 @@ class MarkEntryController extends Controller
 
         $username = $request->getUser();
         $password = $request->getPassword();
+
+        // Hash::check($password, $client->password_hash)
+
         $credentials = [
             'username' => $username,
-            'password' => Hash::make($password), //$password
+            'password' => $password,
         ];
 
         Log::channel('exam_flex_log')->info('Mark Calculation Credentials', [
@@ -30,11 +33,11 @@ class MarkEntryController extends Controller
             return response()->json(['error' => 'Unauthorized Credentials'], 401);
         }
         $domainRecord = DB::table('client_domains')->where('username', $credentials['username'])
-            ->where('password_hash', $credentials['password'])
+            // ->where('password_hash', $credentials['password'])
             ->first();
 
-        if (!$domainRecord) {
-            return response()->json(['error' => 'Unauthorized domain'], 401);
+        if (!$domainRecord || !Hash::check($credentials['password'], $domainRecord->password_hash)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         // Dispatch Job
