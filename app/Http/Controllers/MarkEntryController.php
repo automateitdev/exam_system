@@ -15,7 +15,12 @@ class MarkEntryController extends Controller
             'request' => $request->all()
         ]);
 
-        $credentials = $request->getUserPass();
+        $username = $request->getUser();
+        $password = $request->getPassword();
+        $credentials = [
+            'username' => $username,
+            'password' => $password
+        ];
 
         if (!$credentials || !isset($credentials['username']) || !isset($credentials['password'])) {
             return response()->json(['error' => 'Unauthorized Credentials'], 401);
