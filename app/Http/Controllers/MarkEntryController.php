@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\CalculateExamMarksJob;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class MarkEntryController extends Controller
@@ -19,7 +20,7 @@ class MarkEntryController extends Controller
         $password = $request->getPassword();
         $credentials = [
             'username' => $username,
-            'password' => $password
+            'password' => Hash::make($password), //$password
         ];
 
         Log::channel('exam_flex_log')->info('Mark Calculation Credentials', [
