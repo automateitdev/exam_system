@@ -22,6 +22,9 @@ class MarkEntryController extends Controller
             'password' => $password
         ];
 
+        Log::channel('exam_flex_log')->info('Mark Calculation Credentials', [
+            'credentials' => $credentials
+        ]);
         if (!$credentials || !isset($credentials['username']) || !isset($credentials['password'])) {
             return response()->json(['error' => 'Unauthorized Credentials'], 401);
         }
