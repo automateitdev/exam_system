@@ -82,7 +82,8 @@ class MarkEntryController extends Controller
         $tempId = 'temp_' . Str::random(12);
 
         Log::channel('exam_flex_log')->info('Generated Temp ID for Config', [
-            'temp_id' => $tempId
+            'temp_id' => $tempId,
+            'institute_id' => $request['institute_id']
         ]);
         TempExamConfig::create([
             'temp_id' => $tempId,
