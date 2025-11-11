@@ -28,7 +28,7 @@ class MarkEntryController extends Controller
             'request' => $request->all()
         ]);
 
-        $data = $request->json()->all();
+        $data = $request->all();
 
         $authHeader = $request->header('Authorization');
         if (!$authHeader || !str_starts_with($authHeader, 'Basic ')) {
@@ -90,7 +90,7 @@ class MarkEntryController extends Controller
         TempExamConfig::create([
             'temp_id' => $tempId,
             'institute_id' => $data['institute_id'],
-            'config' => $data,
+            'config' => json_encode($data),
             'expires_at' => now()->addHours(2),
         ]);
 
