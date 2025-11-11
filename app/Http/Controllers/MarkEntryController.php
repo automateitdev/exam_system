@@ -94,7 +94,7 @@ class MarkEntryController extends Controller
             'status' => 'config_saved',
             'temp_id' => $tempId,
             'expires_at' => now()->addHours(2)->toDateTimeString()
-        ], 202);
+        ], 202)->header('Content-Type', 'application/json');
     }
 
     public function processStudents(Request $request)
@@ -167,7 +167,7 @@ class MarkEntryController extends Controller
             'status' => 'success',
             'message' => 'Marks calculated and ready to save',
             'results' => $results
-        ], 200);
+        ], 200)->header('Content-Type', 'application/json');
     }
 
     // public function processStudents(Request $request)
