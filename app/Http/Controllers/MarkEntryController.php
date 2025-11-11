@@ -28,7 +28,6 @@ class MarkEntryController extends Controller
             'request' => $request->all()
         ]);
 
-       // === ১. Authorization হেডার থেকে username:password নিন ===
         $authHeader = $request->header('Authorization');
         if (!$authHeader || !str_starts_with($authHeader, 'Basic ')) {
             return response()->json(['error' => 'Missing or invalid Authorization header'], 401);
@@ -87,7 +86,7 @@ class MarkEntryController extends Controller
         ]);
         TempExamConfig::create([
             'temp_id' => $tempId,
-            'institute_id' => $request->institute_id,
+            'institute_id' => $request['institute_id'],
             'config' => $request->all(),
             'expires_at' => now()->addHours(2),
         ]);
@@ -109,7 +108,6 @@ class MarkEntryController extends Controller
             'request' => $request->all()
         ]);
 
-        // === ১. Authorization হেডার থেকে username:password নিন ===
         $authHeader = $request->header('Authorization');
         if (!$authHeader || !str_starts_with($authHeader, 'Basic ')) {
             return response()->json(['error' => 'Missing or invalid Authorization header'], 401);
