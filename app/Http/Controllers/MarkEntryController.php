@@ -27,7 +27,7 @@ class MarkEntryController extends Controller
         Log::channel('exam_flex_log')->info('Mark Entry Config Request', [
             'request' => $request->all()
         ]);
-        // === JSON থেকে ডাটা নিন ===
+
         $input = $request->all();
 
         if (empty($input)) {
@@ -108,7 +108,6 @@ class MarkEntryController extends Controller
             'request' => $request->all()
         ]);
 
-        // === JSON থেকে ডাটা নিন ===
         $input = $request->all();
 
         if (empty($input)) {
