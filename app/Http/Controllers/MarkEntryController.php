@@ -28,6 +28,8 @@ class MarkEntryController extends Controller
             'request' => $request->all()
         ]);
 
+        $data = $request->json()->all();
+
         $authHeader = $request->header('Authorization');
         if (!$authHeader || !str_starts_with($authHeader, 'Basic ')) {
             return response()->json(['error' => 'Missing or invalid Authorization header'], 401);
@@ -83,12 +85,12 @@ class MarkEntryController extends Controller
 
         Log::channel('exam_flex_log')->info('Generated Temp ID for Config', [
             'temp_id' => $tempId,
-            'institute_id' => $request['institute_id']
+            'institute_id' => $data['institute_id']
         ]);
         TempExamConfig::create([
             'temp_id' => $tempId,
-            'institute_id' => $request['institute_id'],
-            'config' => $request->all(),
+            'institute_id' => $data['institute_id'],
+            'config' => $data,
             'expires_at' => now()->addHours(2),
         ]);
 
