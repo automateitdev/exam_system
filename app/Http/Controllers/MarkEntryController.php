@@ -11,17 +11,22 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Services\ExamMarkCalculator;
+use App\Services\ExamService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class MarkEntryController extends Controller
 {
+    protected $examService;
     protected $examMarkCalculator;
 
-    public function __construct(ExamMarkCalculator $examMarkCalculator)
+    public function __construct(ExamService $examService,  ExamMarkCalculator $examMarkCalculator)
     {
+        $this->examService = $examService;
         $this->examMarkCalculator = $examMarkCalculator;
     }
+
+
     public function storeConfig(Request $request)
     {
         Log::channel('exam_flex_log')->info('Mark Entry Config Request', [
@@ -30,21 +35,23 @@ class MarkEntryController extends Controller
 
         $data = $request->all();
 
-        $authHeader = $request->header('Authorization');
-        if (!$authHeader || !str_starts_with($authHeader, 'Basic ')) {
-            return response()->json(['error' => 'Missing or invalid Authorization header'], 401);
+        $authResult = $this->examService->authenticateRequest($request);
+
+        if ($authResult instanceof \Illuminate\Http\JsonResponse) {
+            return $authResult;
         }
+        $client = $authResult;
 
-        $credentials = base64_decode(substr($authHeader, 6));
-        [$username, $password] = explode(':', $credentials, 2);
+        // $credentials = base64_decode(substr($authHeader, 6));
+        // [$username, $password] = explode(':', $credentials, 2);
 
-        $client = DB::table('client_domains')
-            ->where('username', $username)
-            ->first();
+        // $client = DB::table('client_domains')
+        //     ->where('username', $username)
+        //     ->first();
 
-        if (!$client || !Hash::check($password, $client->password_hash)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
+        // if (!$client || !Hash::check($password, $client->password_hash)) {
+        //     return response()->json(['error' => 'Unauthorized'], 401);
+        // }
 
         // $validator = Validator::make($request->all(), [
         //     'institute_id' => 'required|string|max:50',
