@@ -27,6 +27,12 @@ class MarkEntryController extends Controller
         Log::channel('exam_flex_log')->info('Mark Entry Config Request', [
             'request' => $request->all()
         ]);
+        // === JSON থেকে ডাটা নিন ===
+        $input = $request->json()->all();
+
+        if (empty($input)) {
+            return response()->json(['error' => 'Invalid JSON'], 400);
+        }
         $username = $request->getUser();
         $password = $request->getPassword();
 
@@ -38,7 +44,7 @@ class MarkEntryController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($input, [
             'institute_id' => 'required|string|max:50',
             'exam_type' => 'required|in:semester,class test',
             'subjects' => 'required|array|min:1',
@@ -101,6 +107,14 @@ class MarkEntryController extends Controller
         Log::channel('exam_flex_log')->info('Mark Calculation Request', [
             'request' => $request->all()
         ]);
+
+        // === JSON থেকে ডাটা নিন ===
+        $input = $request->json()->all();
+
+        if (empty($input)) {
+            return response()->json(['error' => 'Invalid JSON'], 400);
+        }
+
         $username = $request->getUser();
         $password = $request->getPassword();
 
@@ -112,7 +126,7 @@ class MarkEntryController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($input, [
             'temp_id' => 'required|string|size:17',
             'students' => 'required|array|min:1|max:1000',
             'students.*.student_id' => 'required|integer|min:1',
