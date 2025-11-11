@@ -8,7 +8,6 @@ use App\Models\TempExamConfig;
 use App\Helpers\ApiResponseHelper;
 use App\Services\ResultCalculator;
 use Illuminate\Support\Facades\DB;
-use App\Jobs\CalculateExamMarksJob;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Services\ExamMarkCalculator;
@@ -18,12 +17,10 @@ use Illuminate\Support\Facades\Validator;
 class MarkEntryController extends Controller
 {
     protected $examMarkCalculator;
-    protected $resultProcess;
 
-    public function __construct(ExamMarkCalculator $examMarkCalculator, ResultCalculator $resultProcess)
+    public function __construct(ExamMarkCalculator $examMarkCalculator)
     {
         $this->examMarkCalculator = $examMarkCalculator;
-        $this->resultProcess = $resultProcess;
     }
     public function storeConfig(Request $request)
     {
@@ -247,7 +244,10 @@ class MarkEntryController extends Controller
             ], 422);
         }
 
-        $results = $this->resultProcess->calculate($request->all());
+        $resultCalculator = app(ResultCalculator::class);
+
+        $results = $resultCalculator->calculate($request->all());
+        // $results = $this->resultProcess->calculate($request->all());
         //
 
         Log::channel('exam_flex_log')->info('Mark Calculation Result', [
