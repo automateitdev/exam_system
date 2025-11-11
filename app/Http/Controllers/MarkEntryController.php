@@ -28,7 +28,7 @@ class MarkEntryController extends Controller
             'request' => $request->all()
         ]);
         // === JSON থেকে ডাটা নিন ===
-        $input = $request->json()->all();
+        $input = $request->all();
 
         if (empty($input)) {
             return response()->json(['error' => 'Invalid JSON'], 400);
@@ -109,7 +109,7 @@ class MarkEntryController extends Controller
         ]);
 
         // === JSON থেকে ডাটা নিন ===
-        $input = $request->json()->all();
+        $input = $request->all();
 
         if (empty($input)) {
             return response()->json(['error' => 'Invalid JSON'], 400);
