@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Log;
 
 class ExamMarkCalculator
 {
+
     public function calculate($payload)
     {
         $results = [];
@@ -13,55 +14,48 @@ class ExamMarkCalculator
             $results[] = $this->calculateStudent($student, $payload);
         }
 
-        $results['institute_id'] = $payload['institute_id'];
-        $results['exam_type'] = 'semester';
-        $results['exam_name'] = $payload['exam_name'];
-        $results['subject_name'] = $payload['subject_name'];
-
-        return $results;
+        return [
+            'results' => $results,
+            'institute_id' => $payload['institute_id'],
+            'exam_type' => 'semester',
+            'exam_name' => $payload['subjects'][0]['exam_name'] ?? 'Semester Exam',
+            'subject_name' => $payload['subjects'][0]['subject_name'] ?? null,
+        ];
     }
 
     private function calculateStudent($student, $payload)
     {
-        Log::channel('exam_flex_log')->info('Calculating Mark', [
-            'student_id' => $student['student_id'],
-            'part_marks' => $student['part_marks'],
-            'exam_config' => $payload['exam_config']
-        ]);
-        $config = $payload['exam_config'];
+        $subject = $payload['subjects'][0]; // প্রথম সাবজেক্ট
+        $details = collect($subject['exam_config']);
+        $method = $subject['method_of_evaluation'] ?? 'At Actual';
+        $graceMark = $subject['grace_mark'] ?? 0;
+        $examName = $subject['exam_name'] ?? 'Semester Exam';
+        $subjectName = $subject['subject_name'] ?? null;
+        $attendanceRequired = $subject['attendance_required'] ?? false;
+        $highestFail = $subject['highest_fail_mark'] ?? null;
+        $overallPassMark = $subject['overall_pass_mark'] ?? null;
+        $gradePoints = $payload['grade_points'] ?? [];
+
         $studentId = $student['student_id'];
         $partMarks = $student['part_marks'];
-        $isAbsent = ($config['attendance_required'] ?? false) &&
+        $isAbsent = $attendanceRequired &&
             (strtolower($student['attendance_status'] ?? 'absent') === 'absent');
-
-        $examName = $config['exam_name'] ?? 'Semester Exam';
-        $subjectName = $config['subject_name'] ?? null;
 
         if ($isAbsent) {
             return $this->absentResult($studentId, $partMarks, $examName, $subjectName);
         }
 
-        $details = collect($config['details']);
-        $method = $config['method_of_evaluation'] ?? 'At Actual';
-        $graceMark = $config['grace_mark'] ?? 0;
-
-        // 1. Obtained Mark
         $calculated = $this->calculateObtainedMark($details, $partMarks, $method);
         $obtainedMark = roundMark($calculated, $method);
 
-        // 2. Individual Pass
         $individualPass = $this->checkIndividualPass($details, $partMarks, $method);
+        $overallPass = $this->checkOverallPass($details, $partMarks, $method, $overallPassMark);
 
-        // 3. Overall Pass
-        $overallPass = $this->checkOverallPass($details, $partMarks, $method, $config['overall_pass_mark'] ?? null);
-
-        // 4. Fail Threshold
-        $failThreshold = $this->getFailThreshold($config);
+        $failThreshold = $highestFail !== null ? $highestFail + 0.01 : 33;
         $finalMark = $obtainedMark;
         $pass = $individualPass && $overallPass && ($finalMark >= $failThreshold);
         $remark = $this->getRemark($pass, $individualPass, $overallPass);
 
-        // 5. Grace
         $appliedGrace = 0;
         if (!$pass && $graceMark > 0 && $finalMark < $failThreshold) {
             $needed = ceil($failThreshold - $finalMark);
@@ -73,8 +67,7 @@ class ExamMarkCalculator
             }
         }
 
-        // 6. Grade
-        $gradeInfo = $this->getGrade($finalMark, $config['grade_points'] ?? []);
+        $gradeInfo = $this->getGrade($finalMark, $gradePoints);
 
         return [
             'student_id' => $studentId,
@@ -154,7 +147,7 @@ class ExamMarkCalculator
 
     private function getFailThreshold($config)
     {
-        $highestFail = $config['grade_threshold']['highest_fail_mark'] ?? null;
+        $highestFail = $config['highest_fail_mark'] ?? null;
         return $highestFail !== null ? $highestFail + 0.01 : 33;
     }
 
