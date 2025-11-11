@@ -12,4 +12,9 @@ class TempExamConfig extends Model
         'config',
         'expires_at',
     ];
+
+    protected $casts = [
+        'config' => 'array', // অটো json_decode
+        'expires_at' => 'datetime',
+    ];
 }
