@@ -68,5 +68,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
         'exam.system' => \App\Http\Middleware\VerifyExamSystemRequest::class,
+        'client.basic' => \App\Http\Middleware\BasicClientAuth::class,
     ];
 }
