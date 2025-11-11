@@ -40,13 +40,6 @@ class MarkEntryController extends Controller
 
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
-            'academic_year_id' => 'required|integer',
-            'department_id' => 'required|integer',
-            'combinations_pivot_id' => 'required|integer',
-            'exam_id' => 'required|integer',
-            'subject_id' => 'required|integer',
-            'group_id' => 'required|array',
-            'student_ids' => 'required|array',
             'subjects' => 'required|array',
             'grade_points' => 'required|array',
         ]);
