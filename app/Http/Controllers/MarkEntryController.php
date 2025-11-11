@@ -87,6 +87,7 @@ class MarkEntryController extends Controller
         //         'details' => $validator->errors()
         //     ], 422);
         // }
+        DB::enableQueryLog();
 
         $tempId = 'temp_' . Str::random(12);
 
@@ -100,6 +101,7 @@ class MarkEntryController extends Controller
             'config' => json_encode($data),
             'expires_at' => now()->addHours(2),
         ]);
+        Log::info(DB::getQueryLog());
 
         Log::channel('exam_flex_log')->info('Mark Entry Config Stored', [
             'temp_id' => $tempId,
