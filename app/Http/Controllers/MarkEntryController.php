@@ -28,11 +28,6 @@ class MarkEntryController extends Controller
             'request' => $request->all()
         ]);
 
-        $input = $request->all();
-
-        if (empty($input)) {
-            return response()->json(['error' => 'Invalid JSON'], 400);
-        }
         $username = $request->getUser();
         $password = $request->getPassword();
 
@@ -44,7 +39,7 @@ class MarkEntryController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $validator = Validator::make($input, [
+        $validator = Validator::make($request->all(), [
             'institute_id' => 'required|string|max:50',
             'exam_type' => 'required|in:semester,class test',
             'subjects' => 'required|array|min:1',
@@ -108,12 +103,6 @@ class MarkEntryController extends Controller
             'request' => $request->all()
         ]);
 
-        $input = $request->all();
-
-        if (empty($input)) {
-            return response()->json(['error' => 'Invalid JSON'], 400);
-        }
-
         $username = $request->getUser();
         $password = $request->getPassword();
 
@@ -125,7 +114,7 @@ class MarkEntryController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $validator = Validator::make($input, [
+        $validator = Validator::make($request->all(), [
             'temp_id' => 'required|string|size:17',
             'students' => 'required|array|min:1|max:1000',
             'students.*.student_id' => 'required|integer|min:1',
